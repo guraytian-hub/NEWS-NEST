@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsNest | Create Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&family=Montserrat&family=Open+Sans&family=Lato&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background: #FAF5F0;
+    color: #333;
+  }
+  header {
+    background: #6DD3CE;
+    color: #fff;
+    text-align: center;
+    padding: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;
+  }
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #FF9A8B;
+    flex-wrap: wrap;
+  }
+  .nav-btn {
+    background: #fff;
+    color: #FF9A8B;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+  .nav-btn:hover { background: #FF9A8B; color: #fff; }
+  main { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+  label { font-weight: 600; }
+  input[type=text], input[type=color], select {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    font-size: 1rem;
+  }
+  .options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .option-input {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .option-input input {
+    flex: 1;
+  }
+  .option-input button {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+  }
+  .option-input button:hover { background: #c0392b; }
+  button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    background: #6DD3CE;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover { background: #4BA6A0; }
+  .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<header>NewsNest - Create Survey</header>
+<nav>
+  <a href="home.html" class="nav-btn">Home</a>
+  <a href="createnews.html" class="nav-btn">Create News</a>
+  <a href="survey.html" class="nav-btn">Create Survey</a>
+</nav>
+
+<main>
+<form id="surveyForm">
+  <label>Survey Title</label>
+  <input type="text" id="surveyTitle" required>
+
+  <label>Title Color</label>
+  <input type="color" id="titleColor" value="#6DD3CE">
+
+  <label>Title Font</label>
+  <select id="titleFont">
+    <option>Poppins</option>
+    <option>Roboto</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+
+  <label>Background Color</label>
+  <input type="color" id="bgColor" value="#ffffff">
+
+  <label>Options</label>
+  <div class="options-container" id="optionsContainer">
+    <div class="option-input">
+      <input type="text" placeholder="Option 1" required>
+      <input type="color" value="#3498db">
+      <button type="button" onclick="removeOption(this)">✕</button>
+    </div>
+    <div class="option-input">
+      <input type="text" placeholder="Option 2" required>
+      <input type="color" value="#e74c3c">
+      <button type="button" onclick="removeOption(this)">✕</button>
+    </div>
+  </div>
+  <button type="button" onclick="addOption()">➕ Add Option</button>
+
+  <div class="btn-group">
+    <button type="submit">Save Survey</button>
+    <button type="button" onclick="previewSurvey()">Preview</button>
+  </div>
+</form>
+</main>
+
+<script>
+function addOption(){
+  const container = document.getElementById("optionsContainer");
+  const div = document.createElement("div");
+  div.classList.add("option-input");
+  div.innerHTML = `
+    <input type="text" placeholder="New Option" required>
+    <input type="color" value="#9b59b6">
+    <button type="button" onclick="removeOption(this)">✕</button>
+  `;
+  container.appendChild(div);
+}
+function removeOption(btn){
+  btn.parentElement.remove();
+}
+function collectSurveyData(){
+  const title = document.getElementById("surveyTitle").value;
+  const titleColor = document.getElementById("titleColor").value;
+  const titleFont = document.getElementById("titleFont").value;
+  const bgColor = document.getElementById("bgColor").value;
+
+  const options = [];
+  document.querySelectorAll("#optionsContainer .option-input").forEach(opt=>{
+    const text = opt.querySelector("input[type=text]").value;
+    const color = opt.querySelector("input[type=color]").value;
+    options.push({text, color, votes:0});
+  });
+
+  return { title, titleColor, titleFont, bgColor, options, date:new Date().toISOString().split("T")[0] };
+}
+document.getElementById("surveyForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  const survey = collectSurveyData();
+  const allSurveys = JSON.parse(localStorage.getItem("newsNestSurveys") || "[]");
+  allSurveys.push(survey);
+  localStorage.setItem("newsNestSurveys", JSON.stringify(allSurveys));
+  alert("Survey saved successfully!");
+  window.location.href = "home.html";
+});
+function previewSurvey(){
+  const survey = collectSurveyData();
+  localStorage.setItem("previewSurvey", JSON.stringify(survey));
+  window.location.href = "previewSurvey.html";
+}
+</script>
+</body>
+</html>

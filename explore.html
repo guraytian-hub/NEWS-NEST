@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsNest | Explore</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap" rel="stylesheet">
+<style>
+/* ===== Base Styles ===== */
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  background: #FAF5F0;
+  color: #333;
+}
+header {
+  background: #6DD3CE;
+  color: #fff;
+  text-align: center;
+  padding: 1.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+}
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #FF9A8B;
+  flex-wrap: wrap;
+}
+.nav-btn {
+  background: #fff;
+  color: #FF9A8B;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.nav-btn:hover { background: #FF9A8B; color: #fff; }
+main { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+footer { text-align: center; padding: 1rem; background: #6DD3CE; color: #fff; margin-top: 2rem; font-size: 0.9rem; }
+
+/* ===== Categories Bar ===== */
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: #fff;
+  border-bottom: 2px solid #eee;
+  border-radius: 12px;
+}
+.categories button {
+  background: #6DD3CE;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.categories button:hover { background: #4BA6A0; }
+.categories button.active { background: #FF9A8B; }
+
+/* ===== News Cards (same as home) ===== */
+.news-card {
+  display: flex;
+  flex-direction: row;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.news-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+.news-card img {
+  width: 220px;
+  height: 220px;
+  border-radius: 12px;
+  object-fit: cover;
+  cursor: pointer;
+}
+.news-content { flex: 1; }
+.news-content h3 {
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  cursor: pointer;
+}
+.news-content p, .news-author, .news-category, .buttons-row {
+  display: none;
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+}
+.buttons-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ===== Button Styles ===== */
+.likes-btn,.views-btn,.edit-btn,.comment-btn {
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.likes-btn {
+  background: linear-gradient(135deg, #FF6B6B, #FFD93D);
+  color: #fff;
+}
+.views-btn {
+  background: linear-gradient(135deg, #6DD3CE, #4BA6A0);
+  color: #fff;
+}
+.edit-btn { background: #FF9A8B; color: #fff; }
+.comment-btn { background: #333; color: #fff; }
+.likes-btn:hover { background: linear-gradient(135deg, #FFD93D, #FF6B6B); transform: scale(1.05); }
+.views-btn:hover { background: linear-gradient(135deg, #4BA6A0, #6DD3CE); transform: scale(1.05); }
+.edit-btn:hover { background: #e66; transform: scale(1.05); }
+.comment-btn:hover { background: #555; transform: scale(1.05); }
+
+@media(max-width:768px){
+  .news-card { flex-direction: column; }
+  .news-card img { width: 100%; height: 250px; }
+}
+</style>
+</head>
+<body>
+
+<header>NewsNest Explore</header>
+<nav>
+  <a href="home.html" class="nav-btn">Home</a>
+  <a href="explore.html" class="nav-btn">Explore</a>
+  <a href="search.html" class="nav-btn">Search</a>
+  <a href="CreateNews.html" class="nav-btn">Create News</a>
+  <a href="ranking.html" class="nav-btn">Ranking</a>
+  <a href="weekly-award.html" class="nav-btn award-btn">Weekly News Award</a>
+  <a href="login.html" class="nav-btn">Login</a>
+</nav>
+
+<!-- Categories -->
+<div class="categories">
+  <button class="active" onclick="filterCategory('ALL', this)">ALL</button>
+  <button onclick="filterCategory('ENTERTAINMENT',this)">ENTERTAINMENT</button>
+  <button onclick="filterCategory('MUSIC', this)">MUSIC</button>
+  <button onclick="filterCategory('KPOP', this)">KPOP</button>
+  <button onclick="filterCategory('ARTS', this)">ARTS</button>
+  <button onclick="filterCategory('LIFESTYLE', this)">LIFESTYLE</button>
+  <button onclick="filterCategory('SPORTS', this)">SPORTS</button>
+  <button onclick="filterCategory('HEALTH', this)">HEALTH</button>
+  <button onclick="filterCategory('TECHNOLOGY', this)">TECHNOLOGY</button>
+  <button onclick="filterCategory('FILM', this)">FILM</button>
+  <button onclick="filterCategory('EDUCATIONAL', this)">EDUCATIONAL</button>
+  <button onclick="filterCategory('ENVIRONMENT', this)">ENVIRONMENT</button>
+  <button onclick="filterCategory('AGRICULTURE', this)">AGRICULTURE</button>
+</div>
+
+<main>
+  <section id="explore-news"></section>
+</main>
+<footer>&copy; 2025 NewsNest | All Readers Are Authors</footer>
+
+<script>
+// ===== Utils =====
+function formatNumber(num){
+  if(num>=1e12) return (num/1e12).toFixed(1)+'T';
+  if(num>=1e9) return (num/1e9).toFixed(1)+'B';
+  if(num>=1e6) return (num/1e6).toFixed(1)+'M';
+  if(num>=1e3) return (num/1e3).toFixed(1)+'K';
+  return num;
+}
+
+// ===== Load News =====
+function loadExploreNews(filter="ALL"){
+  const container=document.getElementById('explore-news');
+  container.innerHTML='';
+  let savedNews=JSON.parse(localStorage.getItem('newsNestArticles')||'[]');
+
+  savedNews.forEach((news,index)=>{
+    if(filter==="ALL" || news.category?.toUpperCase()===filter){
+      const card=document.createElement('div'); card.className='news-card';
+      card.style.backgroundColor=news.bgColor||'#fff';
+      card.innerHTML=`
+        <img src="${news.image}" alt="News Image" onclick="toggleRead(this)">
+        <div class="news-content">
+          <h3 style="color:${news.headlineColor}; font-family:${news.headlineFont}; font-size:${news.headlineSize}" onclick="toggleRead(this)">${news.title}</h3>
+          <div class="news-author" style="color:${news.authorColor}; font-family:${news.authorFont}">${news.author} | ${news.date||new Date().toLocaleDateString()}</div>
+          <div class="news-category" style="color:${news.categoryColor}; font-family:${news.categoryFont}">Category: ${news.category}</div>
+          <p style="color:${news.bodyColor}; font-family:${news.bodyFont}; font-size:${news.bodySize}">${news.content}</p>
+          <div class="buttons-row">
+            <button class="likes-btn" onclick="likeNews(${index})">👍 ${formatNumber(news.likes)} Likes</button>
+            <button class="views-btn" onclick="viewNews(${index})">👁️ ${formatNumber(news.views)} Views</button>
+            <button class="comment-btn" onclick="goToComments(${index})">💬 Comments</button>
+            <button class="edit-btn" onclick="editNews(${index})">✏️ Edit</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+  });
+}
+
+// ===== Actions =====
+function toggleRead(el){
+  const card=el.closest('.news-card');
+  const parts=card.querySelectorAll('p,.news-author,.news-category,.buttons-row');
+  const isVisible=parts[0].style.display==='block';
+  parts.forEach(p=>p.style.display=isVisible?'none':'block');
+}
+function likeNews(index){
+  let allNews=JSON.parse(localStorage.getItem('newsNestArticles')||'[]');
+  allNews[index].likes++;
+  localStorage.setItem('newsNestArticles',JSON.stringify(allNews));
+  loadExploreNews(currentFilter);
+}
+function viewNews(index){
+  let allNews=JSON.parse(localStorage.getItem('newsNestArticles')||'[]');
+  allNews[index].views++;
+  localStorage.setItem('newsNestArticles',JSON.stringify(allNews));
+  loadExploreNews(currentFilter);
+}
+function editNews(index){
+  localStorage.setItem('editNewsIndex',index);
+  window.location.href='edit.html';
+}
+function goToComments(index){
+  window.location.href=`comment.html?index=${index}`;
+}
+
+// ===== Category Filter =====
+let currentFilter="ALL";
+function filterCategory(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.categories button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadExploreNews(cat);
+}
+
+window.onload=()=>loadExploreNews();
+</script>
+</body>
+</html>

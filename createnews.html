@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsNest | Create News</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&family=Montserrat&family=Open+Sans&family=Lato&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background: #FAF5F0;
+    color: #333;
+  }
+  header {
+    background: #6DD3CE;
+    color: #fff;
+    text-align: center;
+    padding: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;
+  }
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #FF9A8B;
+    flex-wrap: wrap;
+  }
+  .nav-btn {
+    background: #fff;
+    color: #FF9A8B;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+  .nav-btn:hover { background: #FF9A8B; color: #fff; }
+  main { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+  label { font-weight: 600; }
+  input[type=text], textarea, select, input[type=color] {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    font-size: 1rem;
+  }
+  textarea { resize: vertical; height: 120px; }
+  button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    background: #6DD3CE;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover { background: #4BA6A0; }
+  .btn-group { display: flex; gap: 1rem; }
+</style>
+</head>
+<body>
+<header>NewsNest - Create News</header>
+<nav>
+  <a href="home.html" class="nav-btn">Home</a>
+  <a href="createnews.html" class="nav-btn">Create News</a>
+</nav>
+
+<main>
+<form id="newsForm">
+  <label>Headline</label>
+  <input type="text" id="title" required>
+
+  <label>Headline Color</label>
+  <input type="color" id="headlineColor" value="#6DD3CE">
+
+  <label>Headline Font</label>
+  <select id="headlineFont">
+    <option>Poppins</option>
+    <option>Roboto</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+
+  <label>Headline Size (px)</label>
+  <input type="text" id="headlineSize" value="32px">
+
+  <label>Body Content</label>
+  <textarea id="content" required></textarea>
+
+  <label>Body Color</label>
+  <input type="color" id="bodyColor" value="#333333">
+
+  <label>Body Font</label>
+  <select id="bodyFont">
+    <option>Roboto</option>
+    <option>Poppins</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+
+  <label>Body Size (px)</label>
+  <input type="text" id="bodySize" value="16px">
+
+  <label>Author</label>
+  <input type="text" id="author">
+
+  <label>Author Color</label>
+  <input type="color" id="authorColor" value="#333333">
+
+  <label>Author Font</label>
+  <select id="authorFont">
+    <option>Roboto</option>
+    <option>Poppins</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+
+  <label>Category</label>
+  <select id="category">
+    <option>ALL</option>
+    <option>MUSIC</option>
+    <option>ARTS</option>
+    <option>LIFESTYLE</option>
+    <option>KPOP</option>
+    <option>ENTERTAINMENT</option>
+    <option>SPORTS</option>
+    <option>EDUCATIONAL</option>
+    <option>HEALTH</option>
+    <option>AGRICULTURE</option>
+    <option>TECHNOLOGY</option>
+    <option>ENVIRONMENT</option>
+    <option>FILM</option>
+  </select>
+
+  <label>Category Color</label>
+  <input type="color" id="categoryColor" value="#333333">
+
+  <label>Category Font</label>
+  <select id="categoryFont">
+    <option>Roboto</option>
+    <option>Poppins</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+
+  <label>Add Image (Optional)</label>
+  <input type="file" id="imageUpload" accept="image/*">
+  <input type="hidden" id="image">
+
+  <label>Background Color</label>
+  <input type="color" id="bgColor" value="#ffffff">
+
+  <div class="btn-group">
+    <button type="submit">Save News</button>
+    <button type="button" onclick="previewNews()">Preview</button>
+  </div>
+</form>
+</main>
+
+<script>
+const imageUpload = document.getElementById('imageUpload');
+const imageHidden = document.getElementById('image');
+
+// Allow any image size
+imageUpload.addEventListener('change', function(){
+  const file = this.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      imageHidden.value = e.target.result;
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+function collectFormData(){
+  return {
+    title: document.getElementById('title').value,
+    headlineColor: document.getElementById('headlineColor').value,
+    headlineFont: document.getElementById('headlineFont').value,
+    headlineSize: document.getElementById('headlineSize').value,
+    content: document.getElementById('content').value,
+    bodyColor: document.getElementById('bodyColor').value,
+    bodyFont: document.getElementById('bodyFont').value,
+    bodySize: document.getElementById('bodySize').value,
+    author: document.getElementById('author').value,
+    authorColor: document.getElementById('authorColor').value,
+    authorFont: document.getElementById('authorFont').value,
+    category: document.getElementById('category').value,
+    categoryColor: document.getElementById('categoryColor').value,
+    categoryFont: document.getElementById('categoryFont').value,
+    date: new Date().toISOString().split('T')[0],
+    image: document.getElementById('image').value || "",
+    bgColor: document.getElementById('bgColor').value,
+    likes:0,
+    views:0,
+    comments:[]
+  };
+}
+
+document.getElementById('newsForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const news = collectFormData();
+  const allNews = JSON.parse(localStorage.getItem('newsNestArticles') || '[]');
+  allNews.push(news);
+  localStorage.setItem('newsNestArticles', JSON.stringify(allNews));
+  alert("News saved successfully!");
+  window.location.href = "home.html";
+});
+
+function previewNews(){
+  const news = collectFormData();
+  localStorage.setItem("previewNews", JSON.stringify(news));
+  window.location.href = "preview.html";
+}
+</script>
+</body>
+</html>

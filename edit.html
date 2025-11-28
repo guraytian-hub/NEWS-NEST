@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsNest | Edit News</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&family=Montserrat&family=Open+Sans&family=Lato&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Roboto',sans-serif;margin:0;background:#FAF5F0;color:#333;}
+header{background:#6DD3CE;color:#fff;text-align:center;padding:1.5rem;font-family:'Poppins',sans-serif;font-size:2.5rem;}
+nav{display:flex;justify-content:center;gap:1rem;padding:1rem;background:#FF9A8B;flex-wrap:wrap;}
+.nav-btn{background:#fff;color:#FF9A8B;border:none;padding:0.7rem 1.5rem;border-radius:12px;font-weight:600;cursor:pointer;text-decoration:none;position:relative;transition:0.3s;overflow:hidden;}
+.nav-btn:hover{background:#FF9A8B;color:#fff;}
+main{max-width:900px;margin:2rem auto;padding:0 1rem;}
+form{display:flex;flex-direction:column;gap:1rem;background:#fff;padding:1.5rem;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.08);}
+label{font-weight:600;}
+input[type=text], input[type=file], textarea, select, input[type=color], input[type=number]{padding:0.5rem;border-radius:8px;border:1px solid #ccc;width:100%;font-size:1rem;}
+textarea{resize:vertical;height:120px;}
+button{padding:0.8rem 1.5rem;border:none;border-radius:12px;font-weight:600;background:#6DD3CE;color:#fff;cursor:pointer;transition:0.3s;}
+button:hover{background:#4BA6A0;}
+.image-preview{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;}
+.image-preview img{height:80px;border-radius:8px;object-fit:cover;border:1px solid #ccc;}
+</style>
+</head>
+<body>
+<header>NewsNest - Edit News</header>
+<nav>
+  <a href="home.html" class="nav-btn">Home</a>
+  <a href="CreateNews.html" class="nav-btn">Create News</a>
+</nav>
+
+<main>
+<form id="editForm">
+  <!-- Headline -->
+  <label>Headline</label>
+  <input type="text" id="title" required>
+  <label>Headline Color</label>
+  <input type="color" id="headlineColor">
+  <label>Headline Font</label>
+  <select id="headlineFont">
+    <option>Poppins</option>
+    <option>Roboto</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+  <label>Headline Size (px)</label>
+  <input type="text" id="headlineSize">
+
+  <!-- Body -->
+  <label>Body Content</label>
+  <textarea id="content" required></textarea>
+  <label>Body Color</label>
+  <input type="color" id="bodyColor">
+  <label>Body Font</label>
+  <select id="bodyFont">
+    <option>Roboto</option>
+    <option>Poppins</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+  <label>Body Size (px)</label>
+  <input type="text" id="bodySize">
+
+  <!-- Author -->
+  <label>Author</label>
+  <input type="text" id="author">
+  <label>Author Color</label>
+  <input type="color" id="authorColor">
+  <label>Author Font</label>
+  <select id="authorFont">
+    <option>Roboto</option>
+    <option>Poppins</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+
+  <!-- Category -->
+  <label>Category</label>
+  <select id="category">
+    <option>ALL</option>
+    <option>MUSIC</option>
+    <option>ARTS</option>
+    <option>LIFESTYLE</option>
+    <option>KPOP</option>
+    <option>ENTERTAINMENT</option>
+    <option>SPORTS</option>
+    <option>EDUCATIONAL</option>
+    <option>HEALTH</option>
+    <option>AGRICULTURE</option>
+    <option>TECHNOLOGY</option>
+    <option>ENVIRONMENT</option>
+    <option>FILM</option>
+  </select>
+  <label>Category Color</label>
+  <input type="color" id="categoryColor">
+  <label>Category Font</label>
+  <select id="categoryFont">
+    <option>Roboto</option>
+    <option>Poppins</option>
+    <option>Montserrat</option>
+    <option>Open Sans</option>
+    <option>Lato</option>
+  </select>
+
+  <!-- Images -->
+  <label>Add Images (Unlimited Size)</label>
+  <input type="file" id="imageUpload" accept="image/*" multiple>
+  <div class="image-preview" id="imagePreview"></div>
+
+  <!-- Background & stats -->
+  <label>Background Color</label>
+  <input type="color" id="bgColor">
+  <label>Views</label>
+  <input type="number" id="views" min="0">
+  <label>Likes</label>
+  <input type="number" id="likes" min="0">
+
+  <button type="button" id="previewBtn">Preview News</button>
+  <button type="submit">Save Changes</button>
+</form>
+</main>
+
+<script>
+// --- IndexedDB setup ---
+let db;
+const request = indexedDB.open("NewsNestDB", 1);
+
+request.onupgradeneeded = e => {
+    db = e.target.result;
+    if(!db.objectStoreNames.contains("images")){
+        db.createObjectStore("images", { keyPath: "id" });
+    }
+};
+
+request.onsuccess = e => { 
+    db = e.target.result; 
+    loadNews(); 
+};
+request.onerror = e => { alert("DB Error: " + e.target.errorCode); };
+
+// --- Load news ---
+let news, index, imagesArray = [];
+
+function loadNews(){
+    index = parseInt(localStorage.getItem('editNewsIndex'));
+    const allNews = JSON.parse(localStorage.getItem('newsNestArticles') || '[]');
+    if(isNaN(index) || !allNews[index]){
+        alert("No news selected!");
+        window.location.href='home.html';
+        return;
+    }
+    news = allNews[index];
+
+    // Fill form
+    document.getElementById('title').value = news.title || '';
+    document.getElementById('headlineColor').value = news.headlineColor || "#6DD3CE";
+    document.getElementById('headlineFont').value = news.headlineFont || "Poppins";
+    document.getElementById('headlineSize').value = news.headlineSize || "32px";
+    document.getElementById('content').value = news.content || '';
+    document.getElementById('bodyColor').value = news.bodyColor || "#333333";
+    document.getElementById('bodyFont').value = news.bodyFont || "Roboto";
+    document.getElementById('bodySize').value = news.bodySize || "16px";
+    document.getElementById('author').value = news.author || '';
+    document.getElementById('authorColor').value = news.authorColor || "#333333";
+    document.getElementById('authorFont').value = news.authorFont || "Roboto";
+    document.getElementById('category').value = news.category || "ALL";
+    document.getElementById('categoryColor').value = news.categoryColor || "#333333";
+    document.getElementById('categoryFont').value = news.categoryFont || "Roboto";
+    document.getElementById('bgColor').value = news.bgColor || "#ffffff";
+    document.getElementById('likes').value = news.likes || 0;
+    document.getElementById('views').value = news.views || 0;
+
+    imagesArray = news.images || [];
+    renderImages();
+}
+
+// --- Render images ---
+function renderImages(){
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = "";
+    imagesArray.forEach(id=>{
+        const tx = db.transaction("images", "readonly");
+        const store = tx.objectStore("images");
+        const req = store.get(id);
+        req.onsuccess = e=>{
+            if(e.target.result){
+                const url = URL.createObjectURL(e.target.result.blob);
+                const img = document.createElement('img');
+                img.src = url;
+                preview.appendChild(img);
+            }
+        };
+    });
+}
+
+// --- Upload images ---
+document.getElementById('imageUpload').addEventListener('change', e=>{
+    const files = Array.from(e.target.files);
+    files.forEach((file,i)=>{
+        const id = "news_"+index+"_img_"+Date.now()+"_"+i;
+        const tx = db.transaction("images", "readwrite");
+        const store = tx.objectStore("images");
+        store.put({id:id, blob:file});
+        imagesArray.push(id);
+        renderImages();
+    });
+});
+
+// --- Save changes ---
+document.getElementById('editForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const allNews = JSON.parse(localStorage.getItem('newsNestArticles') || '[]');
+
+    news.title = document.getElementById('title').value;
+    news.headlineColor = document.getElementById('headlineColor').value;
+    news.headlineFont = document.getElementById('headlineFont').value;
+    news.headlineSize = document.getElementById('headlineSize').value;
+    news.content = document.getElementById('content').value;
+    news.bodyColor = document.getElementById('bodyColor').value;
+    news.bodyFont = document.getElementById('bodyFont').value;
+    news.bodySize = document.getElementById('bodySize').value;
+    news.author = document.getElementById('author').value;
+    news.authorColor = document.getElementById('authorColor').value;
+    news.authorFont = document.getElementById('authorFont').value;
+    news.category = document.getElementById('category').value;
+    news.categoryColor = document.getElementById('categoryColor').value;
+    news.categoryFont = document.getElementById('categoryFont').value;
+    news.bgColor = document.getElementById('bgColor').value;
+    news.likes = parseInt(document.getElementById('likes').value)||0;
+    news.views = parseInt(document.getElementById('views').value)||0;
+    news.images = imagesArray;
+
+    allNews[index] = news;
+    localStorage.setItem('newsNestArticles', JSON.stringify(allNews));
+    alert("Changes saved!");
+    window.location.href='home.html';
+});
+
+// --- Preview ---
+document.getElementById('previewBtn').addEventListener('click', ()=>{
+    const previewData = {
+        title: document.getElementById('title').value,
+        headlineColor: document.getElementById('headlineColor').value,
+        headlineFont: document.getElementById('headlineFont').value,
+        headlineSize: document.getElementById('headlineSize').value,
+        content: document.getElementById('content').value,
+        bodyColor: document.getElementById('bodyColor').value,
+        bodyFont: document.getElementById('bodyFont').value,
+        bodySize: document.getElementById('bodySize').value,
+        author: document.getElementById('author').value,
+        authorColor: document.getElementById('authorColor').value,
+        authorFont: document.getElementById('authorFont').value,
+        category: document.getElementById('category').value,
+        categoryColor: document.getElementById('categoryColor').value,
+        categoryFont: document.getElementById('categoryFont').value,
+        images: imagesArray,
+        bgColor: document.getElementById('bgColor').value,
+        likes: document.getElementById('likes').value,
+        views: document.getElementById('views').value,
+    };
+    localStorage.setItem('previewNews', JSON.stringify(previewData));
+    window.open('pre-view.html','_blank');
+});
+</script>
+</body>
+</html>

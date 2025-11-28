@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NewsNest | Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Roboto',sans-serif;margin:0;background:#FAF5F0;color:#333;}
+header{background:#6DD3CE;color:#fff;text-align:center;padding:1.5rem;font-family:'Poppins',sans-serif;font-size:2.5rem;}
+nav{display:flex;justify-content:center;gap:1rem;padding:1rem;background:#FF9A8B;flex-wrap:wrap;}
+.nav-btn{background:#fff;color:#FF9A8B;border:none;padding:0.7rem 1.5rem;border-radius:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:.3s;}
+.nav-btn:hover{background:#FF9A8B;color:#fff;}
+main{max-width:1000px;margin:2rem auto;padding:0 1rem;}
+footer{text-align:center;padding:1rem;background:#6DD3CE;color:#fff;margin-top:2rem;font-size:.9rem;}
+
+/* News Cards */
+.news-card{display:flex;flex-direction:row;background:#fff;padding:1.5rem;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.08);margin-bottom:2rem;align-items:flex-start;gap:1rem;transition:transform .2s, box-shadow .2s;}
+.news-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.12);}
+.news-card img{width:220px;height:220px;border-radius:12px;object-fit:cover;cursor:pointer;}
+.news-content{flex:1;}
+.news-content h3{font-family:'Poppins',sans-serif;margin-bottom:.5rem;font-size:2rem;cursor:pointer;}
+.news-content p,.news-author,.news-category,.buttons-row{display:none;font-size:1.15rem;margin-bottom:.5rem;}
+.buttons-row{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;}
+.likes-btn,.views-btn,.edit-btn,.comment-btn{border:none;padding:.6rem 1.2rem;border-radius:10px;font-weight:600;cursor:pointer;transition:all .3s ease;}
+.likes-btn{background:linear-gradient(135deg,#FF6B6B,#FFD93D);color:#fff;}
+.views-btn{background:linear-gradient(135deg,#6DD3CE,#4BA6A0);color:#fff;}
+.edit-btn{background:#FF9A8B;color:#fff;}
+.comment-btn{background:#333;color:#fff;}
+.likes-btn:hover{background:linear-gradient(135deg,#FFD93D,#FF6B6B);transform:scale(1.05);}
+.views-btn:hover{background:linear-gradient(135deg,#4BA6A0,#6DD3CE);transform:scale(1.05);}
+.edit-btn:hover{background:#e66;transform:scale(1.05);}
+.comment-btn:hover{background:#555;transform:scale(1.05);}
+@media(max-width:768px){
+  .news-card{flex-direction:column;}
+  .news-card img{width:100%;height:250px;}
+}
+
+/* Survey Cards */
+.section-title{font-family:'Poppins',sans-serif;font-size:1.8rem;margin:2.2rem 0 1rem;}
+.survey-card{background:#fff;border-radius:12px;padding:1.2rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,.08);}
+.survey-header{display:flex;justify-content:space-between;align-items:center;gap:.8rem;margin-bottom:.8rem;}
+.survey-title{margin:0;font-family:'Poppins',sans-serif;font-size:1.6rem;line-height:1.2;}
+.survey-meta{font-size:.9rem;opacity:.7;}
+.option-row{display:flex;align-items:center;gap:.6rem;margin:.6rem 0;}
+.option-label{flex:1;display:flex;align-items:center;gap:.5rem;}
+.option-label span{font-size:1rem;}
+.progress{width:100%;background:#eee;border-radius:8px;overflow:hidden;height:14px;margin-top:.25rem;}
+.progress-bar{height:100%;text-align:right;color:#fff;font-size:.75rem;line-height:14px;padding-right:4px;min-width:0;transition:width .35s ease;}
+.survey-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem;}
+.btn{border:none;border-radius:10px;padding:.55rem .95rem;font-weight:600;cursor:pointer;transition:.2s;}
+.btn-primary{background:#6DD3CE;color:#fff;}
+.btn-primary:hover{background:#4BA6A0;}
+.btn-ghost{background:#fff;border:2px solid #6DD3CE;color:#4BA6A0;}
+.btn-ghost:hover{background:#EAF9F8;}
+.helper{font-size:.9rem;opacity:.7;margin-top:.3rem;}
+</style>
+</head>
+<body>
+
+<header>NewsNest Home</header>
+
+<nav>
+  <a href="home.html" class="nav-btn">Home</a>
+  <a href="explore.html" class="nav-btn">Explore</a>
+  <a href="search.html" class="nav-btn">Search</a>
+  <a href="CreateNews.html" class="nav-btn">Create News</a>
+  <a href="ranking.html" class="nav-btn">Ranking</a>
+  <a href="weekly-award.html" class="nav-btn">Weekly News Award</a>
+  <a href="survey.html" class="nav-btn">Create Survey</a>
+  <a href="login.html" class="nav-btn">Login</a>
+</nav>
+
+<main>
+  <!-- News Section -->
+  <section id="explore-news"></section>
+
+  <!-- Survey Section -->
+  <h2 class="section-title">Weekly Surveys</h2>
+  <section id="surveys"></section>
+</main>
+
+<footer>&copy; 2025 NewsNest | All Readers Are Authors</footer>
+
+<script>
+/* ===== Utilities ===== */
+function formatNumber(num){
+  if(num>=1e12) return (num/1e12).toFixed(1)+'T';
+  if(num>=1e9)  return (num/1e9 ).toFixed(1)+'B';
+  if(num>=1e6)  return (num/1e6 ).toFixed(1)+'M';
+  if(num>=1e3)  return (num/1e3)+'K';
+  return num;
+}
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+/* ===== IndexedDB for images ===== */
+let db;
+const request = indexedDB.open("NewsNestDB", 1);
+request.onupgradeneeded = e=>{
+  db = e.target.result;
+  if(!db.objectStoreNames.contains("images")){
+    db.createObjectStore("images",{keyPath:"id"});
+  }
+};
+request.onsuccess = e=>{ db = e.target.result; loadExploreNews(); renderSurveys(); };
+request.onerror = e=>{ console.error("DB Error:", e.target.error); };
+
+/* ===== News Functions ===== */
+function loadExploreNews(filter="ALL"){
+  const container=document.getElementById('explore-news');
+  container.innerHTML='';
+  let savedNews=JSON.parse(localStorage.getItem('newsNestArticles')||'[]');
+
+  savedNews.forEach((news,index)=>{
+    if(filter==="ALL" || (news.category||'').toUpperCase()===filter){
+      const card=document.createElement('div');
+      card.className='news-card';
+      card.style.backgroundColor=news.bgColor||'#fff';
+
+      const imgEl = document.createElement('img');
+      imgEl.alt = "News Image";
+      imgEl.onclick = ()=>toggleRead(imgEl);
+
+      if(news.images && news.images.length && db){
+        const tx = db.transaction("images","readonly");
+        const store = tx.objectStore("images");
+        const req = store.get(news.images[0]);
+        req.onsuccess = ev=>{
+          if(ev.target.result) imgEl.src = URL.createObjectURL(ev.target.result.blob);
+          else imgEl.src = '';
+        };
+      }
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className='news-content';
+      contentDiv.innerHTML=`
+        <h3 style="color:${news.headlineColor||'#333'}; font-family:${news.headlineFont||'Poppins'}; font-size:${news.headlineSize||'32px'}" onclick="toggleRead(this)">${news.title||'Untitled'}</h3>
+        <div class="news-author">${news.author||'Anonymous'} | ${news.date||new Date().toLocaleDateString()}</div>
+        <div class="news-category">Category: ${news.category||'ALL'}</div>
+        <p>${news.content||''}</p>
+        <div class="buttons-row">
+          <button class="likes-btn" onclick="likeNews(${index})">👍 ${formatNumber(news.likes||0)} Likes</button>
+          <button class="views-btn" onclick="viewNews(${index})">👁️ ${formatNumber(news.views||0)} Views</button>
+          <button class="comment-btn" onclick="goToComments(${index})">💬 Comments</button>
+          <button class="edit-btn" onclick="editNews(${index})">✏️ Edit</button>
+        </div>
+      `;
+
+      card.appendChild(imgEl);
+      card.appendChild(contentDiv);
+      container.appendChild(card);
+    }
+  });
+}
+function toggleRead(el){
+  const card = el.closest('.news-card');
+  const parts = card.querySelectorAll('p,.news-author,.news-category,.buttons-row');
+  const isVisible = parts[0] && parts[0].style.display==='block';
+  parts.forEach(p=>p.style.display=isVisible?'none':'block');
+}
+function likeNews(index){
+  let allNews=JSON.parse(localStorage.getItem('newsNestArticles')||'[]');
+  allNews[index].likes=(allNews[index].likes||0)+1;
+  localStorage.setItem('newsNestArticles',JSON.stringify(allNews));
+  loadExploreNews();
+}
+function viewNews(index){
+  let allNews=JSON.parse(localStorage.getItem('newsNestArticles')||'[]');
+  allNews[index].views=(allNews[index].views||0)+1;
+  localStorage.setItem('newsNestArticles',JSON.stringify(allNews));
+  loadExploreNews();
+}
+function editNews(index){
+  localStorage.setItem('editNewsIndex',index);
+  window.location.href='edit.html';
+}
+function goToComments(index){ window.location.href=`comment.html?index=${index}`; }
+
+/* ===== Survey Functions ===== */
+function getSurveys(){ try{ return JSON.parse(localStorage.getItem('newsNestSurveys')||'[]'); } catch(e){ return []; } }
+function setSurveys(arr){ localStorage.setItem('newsNestSurveys',JSON.stringify(arr)); }
+
+function renderSurveys(){
+  const wrap = document.getElementById('surveys');
+  wrap.innerHTML = '';
+  const surveys = getSurveys();
+  if(!surveys.length){ wrap.innerHTML = `<p class="helper">No surveys yet. <a href="survey.html">Create one</a>.</p>`; return; }
+
+  surveys.forEach((sv, idx)=>{
+    const title = sv.title || 'Untitled Survey';
+    const options = Array.isArray(sv.options)? [...sv.options] : [];
+    const votesAllowed = clamp(parseInt(sv.votesAllowed||1,10),1,20);
+
+    options.sort((a,b)=>(b.votes||0)-(a.votes||0));
+    const totalVotes = options.reduce((s,o)=> s + (parseInt(o.votes||0,10)||0), 0);
+
+    const card = document.createElement('div');
+    card.className='survey-card';
+    card.innerHTML=`
+      <div class="survey-header">
+        <div>
+          <h3 class="survey-title">${title}</h3>
+          <div class="survey-meta">Votes allowed per voter: <strong>${votesAllowed}</strong></div>
+        </div>
+        <div class="survey-actions">
+          <button class="btn btn-ghost" onclick="goEditSurvey(${idx})">✏️ Edit</button>
+        </div>
+      </div>
+      <div id="survey-${idx}-options"></div>
+      <div class="survey-actions">
+        <button class="btn btn-primary" onclick="submitSurveyVote(${idx})">Submit Vote</button>
+      </div>
+      <div class="helper">Total votes: ${formatNumber(totalVotes)}.</div>
+    `;
+
+    const optDiv = card.querySelector(`#survey-${idx}-options`);
+    options.forEach((opt, oi)=>{
+      const count = parseInt(opt.votes||0,10)||0;
+      const pct = totalVotes ? Math.round((count/totalVotes)*100) : 0;
+      const color = opt.color || '#6DD3CE';
+      const row = document.createElement('div');
+      row.className='option-row';
+      row.innerHTML=`
+        <label class="option-label">
+          ${votesAllowed===1
+            ? `<input type="radio" name="sv-${idx}" value="${oi}">`
+            : `<input type="checkbox" name="sv-${idx}" value="${oi}">`
+          }
+          <span>${opt.text||'Option'}</span>
+        </label>
+        <div style="flex:2">
+          <div class="progress">
+            <div class="progress-bar" style="width:${pct}%; background:${color}">${pct? pct+'%':''}</div>
+          </div>
+        </div>
+        <div style="min-width:70px;text-align:right">${formatNumber(count)}</div>
+      `;
+      optDiv.appendChild(row);
+    });
+
+    wrap.appendChild(card);
+  });
+}
+
+function submitSurveyVote(sIndex){
+  const surveys = getSurveys();
+  const sv = surveys[sIndex];
+  if(!sv || !Array.isArray(sv.options)) return;
+
+  const votesAllowed = clamp(parseInt(sv.votesAllowed||1,10),1,20);
+  const selected = Array.from(document.querySelectorAll(`input[name="sv-${sIndex}"]`))
+                        .filter(i=>i.checked).map(i=>parseInt(i.value,10));
+  if(!selected.length){ alert('Select at least 1 option.'); return; }
+  if(selected.length>votesAllowed){ alert(`Max ${votesAllowed} choices.`); return; }
+
+  selected.forEach(oi=>{ sv.options[oi].votes = (parseInt(sv.options[oi].votes||0,10)||0) + 1; });
+  setSurveys(surveys);
+  renderSurveys();
+  alert('Vote recorded!');
+}
+
+function goEditSurvey(index){ window.location.href=`editsurvey.html?index=${index}`; }
+</script>
+
+</body>
+</html>

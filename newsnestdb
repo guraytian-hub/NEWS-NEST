@@ -1,0 +1,25 @@
+function saveImage(file, id) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const db = request.result;
+    const tx = db.transaction("images", "readwrite");
+    const store = tx.objectStore("images");
+    store.put({ id: id, blob: e.target.result }); // store the image blob
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function loadImage(id, callback) {
+    const db = request.result;
+    const tx = db.transaction("images", "readonly");
+    const store = tx.objectStore("images");
+    const getRequest = store.get(id);
+    getRequest.onsuccess = e => {
+      if(e.target.result){
+        const blob = e.target.result.blob;
+        const url = URL.createObjectURL(blob);
+        callback(url); // use the URL for preview
+      }
+    };
+  }
+  

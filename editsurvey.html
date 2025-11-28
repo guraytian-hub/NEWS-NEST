@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NewsNest | Edit Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Roboto',sans-serif;margin:0;background:#FAF5F0;color:#333;}
+  header{background:#6DD3CE;color:#fff;text-align:center;padding:1.5rem;font-family:'Poppins',sans-serif;font-size:2.2rem;}
+  nav{display:flex;justify-content:center;gap:1rem;padding:1rem;background:#FF9A8B;flex-wrap:wrap;}
+  .nav-btn{background:#fff;color:#FF9A8B;border:none;padding:0.6rem 1.2rem;border-radius:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:0.2s;}
+  .nav-btn:hover{background:#FF9A8B;color:#fff;}
+  main{max-width:900px;margin:2rem auto;padding:0 1rem;}
+  form{display:flex;flex-direction:column;gap:1rem;background:#fff;padding:1.5rem;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.08);}
+  label{font-weight:600;}
+  input[type=text], input[type=number], input[type=color], select{padding:0.5rem;border-radius:8px;border:1px solid #ccc;width:100%;font-size:1rem;}
+  .options-container{display:flex;flex-direction:column;gap:0.6rem;}
+  .option-row{display:flex;gap:0.6rem;align-items:center;}
+  .option-row input[type="text"]{flex:1;}
+  .option-row input[type="color"]{width:56px;}
+  .option-row .remove-btn{background:#e74c3c;color:#fff;border:none;border-radius:8px;padding:.45rem .7rem;cursor:pointer;}
+  .controls{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem;}
+  .btn{padding:0.8rem 1.2rem;border-radius:10px;border:none;font-weight:600;cursor:pointer;}
+  .btn-save{background:#6DD3CE;color:#fff;}
+  .btn-preview{background:#4BA6A0;color:#fff;}
+  .btn-cancel{background:#f66;color:#fff;}
+  .btn-add{background:#3498db;color:#fff;}
+  .help{font-size:0.9rem;color:#666;}
+  @media(max-width:640px){
+    .option-row{flex-direction:column;align-items:stretch;}
+    .option-row input[type="color"]{width:100%;}
+  }
+</style>
+</head>
+<body>
+<header>NewsNest - Edit Survey</header>
+<nav>
+  <a href="home.html" class="nav-btn">Home</a>
+  <a href="survey.html" class="nav-btn">Surveys</a>
+  <a href="survey.html" class="nav-btn">Create Survey</a>
+</nav>
+
+<main>
+  <form id="editSurveyForm">
+    <label>Survey Title</label>
+    <input type="text" id="title" placeholder="e.g. Most Beautiful" required>
+
+    <label>Title Color</label>
+    <input type="color" id="titleColor" value="#6DD3CE">
+
+    <label>Title Font</label>
+    <select id="titleFont">
+      <option>Poppins</option><option>Roboto</option><option>Montserrat</option><option>Open Sans</option><option>Lato</option>
+    </select>
+
+    <label>Title Size (e.g. 28px)</label>
+    <input type="text" id="titleSize" value="28px">
+
+    <label>Options</label>
+    <div class="options-container" id="optionsContainer">
+      <!-- option rows inserted here -->
+    </div>
+    <div class="controls">
+      <button type="button" class="btn btn-add" id="addOptionBtn">➕ Add Option</button>
+      <span class="help">Each option needs a name, color, and votes (you can type 1k / 2m / 500)</span>
+    </div>
+
+    <label>Background Color</label>
+    <input type="color" id="bgColor" value="#ffffff">
+
+    <label>How many views do you like?</label>
+    <input type="text" id="views" placeholder="e.g. 1k, 2000">
+
+    <label>How many likes do you like?</label>
+    <input type="text" id="likes" placeholder="e.g. 500, 2k">
+
+    <div class="controls">
+      <button type="submit" class="btn btn-save">💾 Save Changes</button>
+      <button type="button" class="btn btn-preview" id="previewBtn">🔎 Preview</button>
+      <button type="button" class="btn btn-cancel" id="cancelBtn">✖ Cancel</button>
+    </div>
+  </form>
+</main>
+
+<script>
+/* Utility: try a list of keys and return first existing key + parsed array */
+function loadSurveysFromStorage(){
+  const keys = ['newsNestSurveys','surveys','newsNestSurvey'];
+  for(const k of keys){
+    const raw = localStorage.getItem(k);
+    if(raw){
+      try{ const arr = JSON.parse(raw); if(Array.isArray(arr)) return {key:k,arr}; }catch(e){}
+    }
+  }
+  // nothing found, create default under newsNestSurveys
+  return {key:'newsNestSurveys', arr:[]};
+}
+
+/* Save back to storage key */
+function saveSurveysToStorage(key, arr){
+  localStorage.setItem(key, JSON.stringify(arr));
+}
+
+/* --- Main --- */
+const params = new URLSearchParams(window.location.search);
+const idxParam = params.get('index'); // home.html uses ?index={i}
+const index = idxParam !== null ? parseInt(idxParam,10) : NaN;
+
+const { key: storageKey, arr: surveys } = loadSurveysFromStorage();
+
+if (!Number.isInteger(index) || index < 0 || index >= surveys.length) {
+  alert('Survey not found (invalid index). Returning to home.');
+  window.location.href = 'home.html';
+}
+
+// Work on a copy (so preview can use original)
+const survey = JSON.parse(JSON.stringify(surveys[index] || {})); // fallback to {}
+
+const titleEl = document.getElementById('title');
+const titleColorEl = document.getElementById('titleColor');
+const titleFontEl = document.getElementById('titleFont');
+const titleSizeEl = document.getElementById('titleSize');
+const bgColorEl = document.getElementById('bgColor');
+const viewsEl = document.getElementById('views');
+const likesEl = document.getElementById('likes');
+const optionsContainer = document.getElementById('optionsContainer');
+const addOptionBtn = document.getElementById('addOptionBtn');
+const editForm = document.getElementById('editSurveyForm');
+const previewBtn = document.getElementById('previewBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+
+// Helper to normalize option objects from different shapes
+function normalizeOption(opt){
+  // some saved items might have {text,color,votes} or {name,color,votes}
+  return {
+    text: (opt.text || opt.name || '').toString(),
+    color: (opt.color || opt.col || '#6DD3CE').toString(),
+    votes: (opt.votes === undefined ? (opt.count || '') : opt.votes).toString()
+  };
+}
+
+// create option row DOM
+function createOptionRow(text='', color='#6DD3CE', votes=''){
+  const div = document.createElement('div');
+  div.className = 'option-row';
+  div.innerHTML = `
+    <input type="text" class="opt-text" placeholder="Option name" value="${escapeHtml(text)}" required>
+    <input type="color" class="opt-color" value="${color}">
+    <input type="text" class="opt-votes" placeholder="votes (e.g. 1k)" value="${escapeHtml(votes)}" />
+    <button type="button" class="remove-btn" title="Remove option">✕</button>
+  `;
+  // remove behavior
+  div.querySelector('.remove-btn').addEventListener('click', ()=> div.remove());
+  return div;
+}
+
+function escapeHtml(s){
+  return String(s).replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+}
+
+/* Populate form with survey data (safely) */
+(function populate(){
+  titleEl.value = survey.title || '';
+  titleColorEl.value = survey.titleColor || '#6DD3CE';
+  titleFontEl.value = survey.titleFont || 'Poppins';
+  titleSizeEl.value = survey.titleSize || '28px';
+  bgColorEl.value = survey.bgColor || '#ffffff';
+  viewsEl.value = survey.views || '';
+  likesEl.value = survey.likes || '';
+
+  optionsContainer.innerHTML = '';
+  const opts = Array.isArray(survey.options) ? survey.options : [];
+  if(opts.length === 0){
+    // ensure at least two empty options for editing
+    optionsContainer.appendChild(createOptionRow('Option 1','#6DD3CE','0'));
+    optionsContainer.appendChild(createOptionRow('Option 2','#e74c3c','0'));
+  } else {
+    opts.forEach(o => {
+      const norm = normalizeOption(o);
+      optionsContainer.appendChild(createOptionRow(norm.text, norm.color, norm.votes));
+    });
+  }
+})();
+
+/* Add option button */
+addOptionBtn.addEventListener('click', ()=> {
+  optionsContainer.appendChild(createOptionRow('New Option','#9b59b6','0'));
+});
+
+/* Cancel behavior */
+cancelBtn.addEventListener('click', ()=> {
+  if(confirm('Discard changes and return to Home?')) window.location.href = 'home.html';
+});
+
+/* Preview: save a preview snapshot and open preview page if available */
+previewBtn.addEventListener('click', ()=>{
+  const preview = collectSurveyFromForm(true);
+  localStorage.setItem('previewSurvey', JSON.stringify(preview));
+  // open preview page if you have it; else show a quick preview in new window
+  if (location.pathname.includes('editsurvey.html')) {
+    // try to open previewSurvey.html; if not present user can create it
+    window.open('previewSurvey.html','_blank');
+  } else {
+    // fallback: show JSON
+    window.open().document.write('<pre>'+JSON.stringify(preview,null,2)+'</pre>');
+  }
+});
+
+/* Collect form data into survey object (if forSave true, validate) */
+function collectSurveyFromForm(forSave = false){
+  const title = titleEl.value.trim();
+  const titleColor = titleColorEl.value;
+  const titleFont = titleFontEl.value;
+  const titleSize = titleSizeEl.value;
+  const bgColor = bgColorEl.value;
+  const views = viewsEl.value.trim();
+  const likes = likesEl.value.trim();
+
+  const optionRows = Array.from(optionsContainer.querySelectorAll('.option-row'));
+  const options = optionRows.map(row => {
+    return {
+      text: row.querySelector('.opt-text').value.trim(),
+      color: row.querySelector('.opt-color').value,
+      votes: row.querySelector('.opt-votes').value.trim()
+    };
+  });
+
+  if(forSave){
+    if(!title){ alert('Please enter a survey title.'); return null; }
+    const validOptions = options.filter(o => o.text.length > 0);
+    if(validOptions.length < 2){ alert('Please provide at least ten options.'); return null; }
+  }
+
+  // preserve other fields like date if present
+  const out = Object.assign({}, survey);
+  out.title = title;
+  out.titleColor = titleColor;
+  out.titleFont = titleFont;
+  out.titleSize = titleSize;
+  out.bgColor = bgColor;
+  out.views = views;
+  out.likes = likes;
+  out.options = options;
+  out.date = out.date || new Date().toISOString().split('T')[0];
+
+  return out;
+}
+
+/* Save form */
+editForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const updated = collectSurveyFromForm(true);
+  if(!updated) return;
+
+  // write back to the same storage key we read from
+  surveys[index] = updated;
+  saveSurveysToStorage(storageKey, surveys);
+
+  alert('Survey saved successfully.');
+  window.location.href = 'home.html';
+});
+</script>
+</body>
+</html>
